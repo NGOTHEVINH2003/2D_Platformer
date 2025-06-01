@@ -554,7 +554,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!4 &1385702752
 Transform:
@@ -588,9 +588,16 @@ MonoBehaviour:
   jumpForce: 16
   doubleJumpForce: 14
   numberOfExtraJump: 1
+  bufferJumpWindow: 0.25
+  bufferJumpPressed: -1
+  wallJumpDuration: 0.6
+  wallJumpForce: {x: 5, y: 15}
+  knockBackDuration: 1
+  knockBackForce: {x: 0, y: 0}
   isAirBorne: 0
   isGrounded: 0
   isWallDetected: 0
+  canDoExtraJump: 0
   extraJump: 1
   facingDirection: 1
   xInput: 0
