@@ -98,16 +98,7 @@ public class PlayerMovement : MonoBehaviour
         isWallDetected = Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallDetectDistance, groundLayer);
     }
 
-    public void KnockBack()
-    {
-        if (isHit) return;
-
-        StartCoroutine(GetHitCoroutine());
-
-        rb.velocity = new Vector2(knockBackForce.x * -facingDirection, knockBackForce.y);
-        anim.SetTrigger("Hit");
-    }
-
+   
     private void HandleInput() 
     {
         xInput = Input.GetAxisRaw("Horizontal");
@@ -156,14 +147,7 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-    private void AttemptBufferJump()
-    {
-        if(Time.time < bufferJumpPressed + bufferJumpWindow)
-        {
-            bufferJumpPressed -= 1;
-            Jump(); 
-        }
-    }
+   
 
     private void PressJump()
     {
@@ -183,7 +167,7 @@ public class PlayerMovement : MonoBehaviour
 
         CancelCoyoteJump();
     }
-
+    #region Jumping Logic.
     private void DoubleJump()
     {
         isWallJumping = false;
@@ -191,7 +175,6 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
         extraJump -= 1;
     }
-
     private void WallJump()
     {
         rb.velocity = new Vector2(wallJumpForce.x * -facingDirection, wallJumpForce.y);
@@ -200,13 +183,39 @@ public class PlayerMovement : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(WallJumpCoroutine());
     }
-
+    private void AttemptBufferJump()
+    {
+        if (Time.time < bufferJumpPressed + bufferJumpWindow)
+        {
+            bufferJumpPressed -= 1;
+            Jump();
+        }
+    }
     private IEnumerator WallJumpCoroutine()
     {
         isWallJumping = true;
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
 
+    }
+    private void RequestBufferJump()
+    {
+        if (isAirBorne) bufferJumpPressed = Time.time;
+    }
+    private void ActivateCoyoteJump() => coyoteJumpPressed = Time.time;
+    private void CancelCoyoteJump() => coyoteJumpPressed -= Time.time -1;
+    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    #endregion
+
+    #region KnockBack Handling
+    public void KnockBack()
+    {
+        if (isHit) return;
+
+        StartCoroutine(GetHitCoroutine());
+
+        rb.velocity = new Vector2(knockBackForce.x * -facingDirection, knockBackForce.y);
+        anim.SetTrigger("Hit");
     }
 
     private IEnumerator GetHitCoroutine()
@@ -218,14 +227,7 @@ public class PlayerMovement : MonoBehaviour
         anim.SetTrigger("GetUp");
         isHit = false;
     }
-    private void RequestBufferJump()
-    {
-        if (isAirBorne) bufferJumpPressed = Time.time;
-    }
-    private void ActivateCoyoteJump() => coyoteJumpPressed = Time.time;
-    private void CancelCoyoteJump() => coyoteJumpPressed -= Time.time -1;
-
-    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    #endregion
 
     private void Run() => rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
 
